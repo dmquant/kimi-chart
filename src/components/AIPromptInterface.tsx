@@ -4,6 +4,7 @@
 import { useState } from 'react';
 
 type AIPromptProps = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onShapesGenerated: (elements: any[]) => Promise<void> | void;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
@@ -34,10 +35,13 @@ export default function AIPromptInterface({ onShapesGenerated, isLoading, setIsL
         console.log('Got elements:', data.elements.length, data.elements); // DEBUG
 
         // Separate shapes from arrows
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const shapes = data.elements.filter((el: any) => el.type !== 'arrow');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const arrows = data.elements.filter((el: any) => el.type === 'arrow');
 
         // Position shapes in a grid
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const positionedShapes = shapes.map((element: any, index: number) => {
           const positioned = {
             ...element,
@@ -50,6 +54,7 @@ export default function AIPromptInterface({ onShapesGenerated, isLoading, setIsL
         });
 
         // Position arrows between shapes to connect rows
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const positionedArrows = arrows.map((element: any, index: number) => {
           // Calculate which row this arrow belongs to (connecting from row to row+1)
           const row = Math.floor(index / 3);

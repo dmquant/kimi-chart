@@ -13,6 +13,7 @@ interface AIElement {
   endIndex?: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function convertAIElementsToExcalidraw(aiElements: AIElement[]): Promise<any[]> {
   try {
     // Dynamically import convertToExcalidrawElements on client side only
@@ -20,7 +21,7 @@ export async function convertAIElementsToExcalidraw(aiElements: AIElement[]): Pr
 
     // Separate shapes from arrows and filter out invalid elements
     const shapes = aiElements.filter(el => el.type !== 'arrow' && el.type !== 'text');
-    let arrows = aiElements.filter(el => el.type === 'arrow');
+    const arrows = aiElements.filter(el => el.type === 'arrow');
     const textElements = aiElements.filter(el => el.type === 'text' && el.text && el.text.trim() !== '');
 
     console.log(`Found ${shapes.length} shapes, ${arrows.length} arrows, ${textElements.length} valid text elements`);
@@ -33,7 +34,6 @@ export async function convertAIElementsToExcalidraw(aiElements: AIElement[]): Pr
       // For each shape (except last row), create arrows to connect to next row
       for (let i = 0; i < shapes.length - 3; i++) {
         const fromShape = shapes[i];
-        const toShape = shapes[i + 3]; // Connect to shape in next row
 
         // Create arrow positioned between the two shapes
         arrows.push({
@@ -55,7 +55,8 @@ export async function convertAIElementsToExcalidraw(aiElements: AIElement[]): Pr
       const defaultWidth = element.width || 150;
       const defaultHeight = element.height || 80;
 
-      let shapeEl: any = {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const shapeEl: any = {
         type: element.type,
         x: element.x,
         y: element.y,
@@ -110,6 +111,7 @@ export async function convertAIElementsToExcalidraw(aiElements: AIElement[]): Pr
 
       const arrowHeight = element.height || 100;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const arrowEl: any = {
         type: "arrow",
         x: element.x,
@@ -149,6 +151,7 @@ export async function convertAIElementsToExcalidraw(aiElements: AIElement[]): Pr
     const standaloneTextElements = textElements.map((element, index) => {
       const textId = `text_${Date.now()}_${index}`;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const textEl: any = {
         type: "text",
         x: element.x,
