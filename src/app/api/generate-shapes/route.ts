@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { callAICompletion, getAIProviderConfig } from '@/lib/aiProvider';
 
 // Define schemas for Excalidraw elements
 const excalidrawElementSchema = z.object({
@@ -21,32 +22,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
-    // Get Moonshot API key from environment
-    const apiKey = process.env.MOONSHOT_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: 'MOONSHOT_API_KEY not configured' },
-        { status: 500 }
-      );
-    }
+    // Get AI provider configuration
+    const providerConfig = getAIProviderConfig();
+    console.log(`Using AI provider: ${providerConfig.name} (${providerConfig.model})`);
 
-    // Use Kimi K2 thinking model directly via API
-    const response = await fetch('https://api.moonshot.cn/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+    // Call AI API with provider abstraction
+    const aiResponse = await callAICompletion([
+      {
+        role: 'system',
+        content: 'You are a helpful assistant that generates structured data for Excalidraw diagrams. Always respond with a JSON object containing an array of elements with type, text, width, and height properties.'
       },
-      body: JSON.stringify({
-        model: 'kimi-k2-thinking',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a helpful assistant that generates structured data for Excalidraw diagrams. Always respond with a JSON object containing an array of elements with type, text, width, and height properties.'
-          },
-          {
-            role: 'user',
-            content: `Generate Excalidraw elements based on this user request: "${prompt}"
+      {
+        role: 'user',
+        content: `Generate Excalidraw elements based on this user request: "${prompt}"
 
 Return an array of elements with their types and properties. For flowcharts and diagrams:
 - Use rectangles for processes/steps
@@ -66,32 +54,10 @@ Example for "user login flow":
     { "type": "ellipse", "text": "End" }
   ]
 }`
-          }
-        ],
-        temperature: 0.3,
-      }),
-    });
+      }
+    ], 0.3);
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error('Moonshot API error:', error);
-      return NextResponse.json(
-        { error: `API Error: ${response.status} ${response.statusText}` },
-        { status: response.status }
-      );
-    }
-
-    const data = await response.json();
-    const aiResponse = data.choices[0]?.message?.content;
-
-    console.log('Kimi K2 Raw Response:', aiResponse); // DEBUG
-
-    if (!aiResponse) {
-      return NextResponse.json(
-        { error: 'No response from AI' },
-        { status: 500 }
-      );
-    }
+    console.log(`${providerConfig.name} Raw Response:`, aiResponse); // DEBUG
 
     // Parse the JSON response from the AI
     // The AI might wrap it in markdown code blocks, so try to extract it
@@ -130,8 +96,9 @@ Example for "user login flow":
     return NextResponse.json({ elements: validated.elements });
   } catch (error) {
     console.error('AI generation error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to generate shapes';
     return NextResponse.json(
-      { error: 'Failed to generate shapes' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

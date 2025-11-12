@@ -7,10 +7,12 @@ import AIPromptInterface from './AIPromptInterface';
 import { convertAIElementsToExcalidraw } from '@/lib/excalidrawUtils';
 
 export default function Whiteboard() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleAIGeneratedShapes = useCallback(async (aiElements: any[]) => {
     if (!excalidrawAPI) {
       console.error('Excalidraw API not available');
@@ -172,8 +174,8 @@ export default function Whiteboard() {
 
       {/* Excalidraw Canvas */}
       <div className="flex-1 relative">
-        <Excalidraw
-          excalidrawAPI={(api: any) => setExcalidrawAPI(api)}
+        {/* @ts-expect-error Excalidraw API type is not exported */}
+        <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)}
           theme="light"
           name="AI Whiteboard"
           viewModeEnabled={false}
