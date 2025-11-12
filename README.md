@@ -38,8 +38,12 @@ An AI-powered whiteboard editor built with Next.js, Excalidraw, and Moonshot AI'
 ### Prerequisites | 环境要求
 
 - Node.js 18+
-- npm or yarn
-- Moonshot AI API key ([Get one here](https://platform.moonshot.cn/)) | 月之暗面 API 密钥（[在此获取](https://platform.moonshot.cn/)）
+- npm or yarn or pnpm
+- AI API key (choose one):
+  - **Moonshot AI** (Recommended) - [Get one here](https://platform.moonshot.cn/) | 月之暗面（推荐）- [在此获取](https://platform.moonshot.cn/)
+  - OpenAI - [Get one here](https://platform.openai.com/)
+  - Anthropic - [Get one here](https://console.anthropic.com/)
+  - DeepSeek - [Get one here](https://platform.deepseek.com/)
 
 ### Installation | 安装步骤
 
@@ -57,10 +61,30 @@ Create a `.env` file in the project root | 在项目根目录创建 `.env` 文�
 cp .env.example .env
 ```
 
-Edit `.env` and add your Moonshot AI API key | 编辑 `.env` 并添加您的月之暗面 API 密钥：
+Edit `.env` and configure your AI provider | 编辑 `.env` 并配置您的 AI 提供商：
 
+**Option 1: Moonshot AI (Default & Recommended) | 选项 1：月之暗面（默认推荐）**
 ```env
+AI_PROVIDER=moonshot
 MOONSHOT_API_KEY=your_moonshot_api_key_here
+```
+
+**Option 2: OpenAI | 选项 2：OpenAI**
+```env
+AI_PROVIDER=openai
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+**Option 3: Anthropic Claude | 选项 3：Anthropic Claude**
+```env
+AI_PROVIDER=anthropic
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+```
+
+**Option 4: DeepSeek | 选项 4：DeepSeek**
+```env
+AI_PROVIDER=deepseek
+DEEPSEEK_API_KEY=your_deepseek_api_key_here
 ```
 
 3. **Run the development server | 运行开发服务器：**
@@ -121,6 +145,34 @@ The application consists of several key components | 应用程序包含几个关
 ### Utilities | 工具函数
 
 - **`excalidrawUtils.ts`**: Converts AI responses to Excalidraw elements | 将 AI 响应转换为 Excalidraw 元素
+- **`aiProvider.ts`**: AI provider abstraction layer supporting multiple providers | AI 提供商抽象层,支持多个 AI 服务
+
+---
+
+## 🤖 Supported AI Providers | 支持的 AI 提供商
+
+This project supports multiple AI providers through a unified abstraction layer. You can switch between providers by setting the `AI_PROVIDER` environment variable.
+
+本项目通过统一抽象层支持多个 AI 提供商。通过设置 `AI_PROVIDER` 环境变量即可切换。
+
+| Provider | Model | Strengths | 优势 |
+|----------|-------|-----------|------|
+| **Moonshot (Kimi)** ⭐ | `kimi-k2-thinking` | Advanced reasoning, Chinese language support | 高级推理能力,中文支持好 |
+| OpenAI | `gpt-4o` | Fast, reliable, widely available | 快速可靠,广泛可用 |
+| Anthropic | `claude-3-5-sonnet` | Strong structured output, safety | 结构化输出强,安全性好 |
+| DeepSeek | `deepseek-chat` | Cost-effective, good performance | 性价比高,性能好 |
+
+### Switching Providers | 切换提供商
+
+Simply change the `AI_PROVIDER` variable in your `.env` file and restart the dev server:
+
+只需修改 `.env` 文件中的 `AI_PROVIDER` 变量并重启开发服务器：
+
+```env
+# Use OpenAI instead of Moonshot
+AI_PROVIDER=openai
+OPENAI_API_KEY=sk-your-openai-key
+```
 
 ---
 
@@ -128,13 +180,23 @@ The application consists of several key components | 应用程序包含几个关
 
 ### AI Model | AI 模型
 
-The project uses `moonshot-v1-8k` for advanced reasoning and diagram generation | 项目使用 `moonshot-v1-8k` 进行高级推理和图表生成
+You can customize the model for each provider using environment variables | 可以通过环境变量自定义每个提供商的模型：
 
-You can change this in `src/app/api/generate-shapes/route.ts` | 您可以在 `src/app/api/generate-shapes/route.ts` 中更改：
+```env
+# Moonshot models | 月之暗面模型
+MOONSHOT_MODEL=kimi-k2-thinking  # default | 默认
 
-```typescript
-model: moonshot('moonshot-v1-8k') // or 'moonshot-v1-32k', 'moonshot-v1-128k'
+# OpenAI models
+OPENAI_MODEL=gpt-4o  # or gpt-4-turbo, gpt-3.5-turbo
+
+# Anthropic models
+ANTHROPIC_MODEL=claude-3-5-sonnet-20241022  # or claude-3-opus
+
+# DeepSeek models
+DEEPSEEK_MODEL=deepseek-chat
 ```
+
+The provider abstraction is located in `src/lib/aiProvider.ts` | 提供商抽象层位于 `src/lib/aiProvider.ts`
 
 ### Styling | 样式
 
