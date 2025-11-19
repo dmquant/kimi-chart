@@ -29,10 +29,10 @@ interface AICompletionResponse {
 
 /**
  * Get AI provider configuration based on environment variables
- * Defaults to Kimi (Moonshot) if AI_PROVIDER is not set
+ * Defaults to Gemini if AI_PROVIDER is not set
  */
 export function getAIProviderConfig(): AIProviderConfig {
-  const provider = process.env.AI_PROVIDER?.toLowerCase() || 'moonshot';
+  const provider = process.env.AI_PROVIDER?.toLowerCase() || 'gemini';
 
   switch (provider) {
     case 'openai':
@@ -60,12 +60,20 @@ export function getAIProviderConfig(): AIProviderConfig {
       };
 
     case 'moonshot':
-    default:
       return {
         name: 'Kimi (Moonshot)',
         model: process.env.MOONSHOT_MODEL || 'kimi-k2-thinking',
         baseURL: 'https://api.moonshot.cn/v1',
         apiKey: process.env.MOONSHOT_API_KEY || '',
+      };
+
+    case 'gemini':
+    default:
+      return {
+        name: 'Google Gemini',
+        model: process.env.GEMINI_MODEL || 'gemini-3-pro-preview',
+        baseURL: 'https://generativelanguage.googleapis.com/v1beta',
+        apiKey: process.env.GEMINI_API_KEY || '',
       };
   }
 }
@@ -89,6 +97,11 @@ export async function callAICompletion(
   // Special handling for Anthropic (different API format)
   if (process.env.AI_PROVIDER?.toLowerCase() === 'anthropic') {
     return callAnthropicAPI(config, messages, temperature);
+  }
+
+  // Special handling for Gemini (different API format)
+  if (process.env.AI_PROVIDER?.toLowerCase() === 'gemini' || !process.env.AI_PROVIDER) {
+    return callGeminiAPI(config, messages, temperature);
   }
 
   // OpenAI-compatible API call (works for OpenAI, Moonshot, DeepSeek, etc.)
@@ -166,6 +179,58 @@ async function callAnthropicAPI(
 
   const data = await response.json() as { content?: Array<{ text: string }> };
   const content = data.content?.[0]?.text;
+
+  if (!content) {
+    throw new Error(`No response from ${config.name} API`);
+  }
+
+  return content;
+}
+
+/**
+ * Special handler for Google Gemini API
+ */
+async function callGeminiAPI(
+  config: AIProviderConfig,
+  messages: AIMessage[],
+  temperature: number
+): Promise<string> {
+  const systemMessage = messages.find(m => m.role === 'system');
+  const conversationMessages = messages.filter(m => m.role !== 'system');
+
+  const requestBody: any = {
+    contents: conversationMessages.map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    })),
+    generationConfig: {
+      temperature: temperature,
+    }
+  };
+
+  if (systemMessage) {
+    requestBody.systemInstruction = {
+      parts: [{ text: systemMessage.content }]
+    };
+  }
+
+  const response = await fetch(`${config.baseURL}/models/${config.model}:generateContent?key=${config.apiKey}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestBody),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(
+      `${config.name} API error: ${response.status} ${response.statusText}\n${errorText}`
+    );
+  }
+
+  const data = await response.json();
+  const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!content) {
     throw new Error(`No response from ${config.name} API`);
