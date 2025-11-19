@@ -2,9 +2,9 @@
 
 ## English | [中文](#中文)
 
-An AI-powered whiteboard editor built with Next.js, Excalidraw, and Moonshot AI's Kimi K2. Describe what you want to draw in natural language, and watch the AI generate diagrams, flowcharts, and shapes on the fly!
+An AI-powered whiteboard editor built with Next.js, Excalidraw, and Google Gemini. Describe what you want to draw in natural language, and watch the AI generate diagrams, flowcharts, and shapes on the fly!
 
-一个由 Next.js、Excalidraw 和 Moonshot AI 的 Kimi K2 驱动的 AI 白板编辑器。用自然语言描述你想绘制的内容，观看 AI 实时生成图表、流程图和形状！
+一个由 Next.js、Excalidraw 和 Google Gemini 驱动的 AI 白板编辑器。用自然语言描述你想绘制的内容，观看 AI 实时生成图表、流程图和形状！
 
 ---
 
@@ -40,7 +40,8 @@ An AI-powered whiteboard editor built with Next.js, Excalidraw, and Moonshot AI'
 - Node.js 18+
 - npm or yarn or pnpm
 - AI API key (choose one):
-  - **Moonshot AI** (Recommended) - [Get one here](https://platform.moonshot.cn/) | 月之暗面（推荐）- [在此获取](https://platform.moonshot.cn/)
+  - **Google Gemini** (Recommended) - [Get one here](https://aistudio.google.com/) | Google Gemini（推荐）- [在此获取](https://aistudio.google.com/)
+  - Moonshot AI - [Get one here](https://platform.moonshot.cn/)
   - OpenAI - [Get one here](https://platform.openai.com/)
   - Anthropic - [Get one here](https://console.anthropic.com/)
   - DeepSeek - [Get one here](https://platform.deepseek.com/)
@@ -63,25 +64,31 @@ cp .env.example .env
 
 Edit `.env` and configure your AI provider | 编辑 `.env` 并配置您的 AI 提供商：
 
-**Option 1: Moonshot AI (Default & Recommended) | 选项 1：月之暗面（默认推荐）**
+**Option 1: Google Gemini (Default & Recommended) | 选项 1：Google Gemini（默认推荐）**
+```env
+AI_PROVIDER=gemini
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+**Option 2: Moonshot AI | 选项 2：月之暗面**
 ```env
 AI_PROVIDER=moonshot
 MOONSHOT_API_KEY=your_moonshot_api_key_here
 ```
 
-**Option 2: OpenAI | 选项 2：OpenAI**
+**Option 3: OpenAI | 选项 3：OpenAI**
 ```env
 AI_PROVIDER=openai
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 
-**Option 3: Anthropic Claude | 选项 3：Anthropic Claude**
+**Option 4: Anthropic Claude | 选项 4：Anthropic Claude**
 ```env
 AI_PROVIDER=anthropic
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
 ```
 
-**Option 4: DeepSeek | 选项 4：DeepSeek**
+**Option 5: DeepSeek | 选项 5：DeepSeek**
 ```env
 AI_PROVIDER=deepseek
 DEEPSEEK_API_KEY=your_deepseek_api_key_here
@@ -157,7 +164,8 @@ This project supports multiple AI providers through a unified abstraction layer.
 
 | Provider | Model | Strengths | 优势 |
 |----------|-------|-----------|------|
-| **Moonshot (Kimi)** ⭐ | `kimi-k2-thinking` | Advanced reasoning, Chinese language support | 高级推理能力,中文支持好 |
+| **Google Gemini** ⭐ | `gemini-3-pro-preview` | Advanced multimodal, strong reasoning, wide capabilities | 高级多模态,推理能力强,功能广泛 |
+| Moonshot (Kimi) | `kimi-k2-thinking` | Advanced reasoning, Chinese language support | 高级推理能力,中文支持好 |
 | OpenAI | `gpt-4o` | Fast, reliable, widely available | 快速可靠,广泛可用 |
 | Anthropic | `claude-3-5-sonnet` | Strong structured output, safety | 结构化输出强,安全性好 |
 | DeepSeek | `deepseek-chat` | Cost-effective, good performance | 性价比高,性能好 |
@@ -169,9 +177,9 @@ Simply change the `AI_PROVIDER` variable in your `.env` file and restart the dev
 只需修改 `.env` 文件中的 `AI_PROVIDER` 变量并重启开发服务器：
 
 ```env
-# Use OpenAI instead of Moonshot
-AI_PROVIDER=openai
-OPENAI_API_KEY=sk-your-openai-key
+# Use Google Gemini
+AI_PROVIDER=gemini
+GEMINI_API_KEY=your-gemini-key
 ```
 
 ---
@@ -183,6 +191,9 @@ OPENAI_API_KEY=sk-your-openai-key
 You can customize the model for each provider using environment variables | 可以通过环境变量自定义每个提供商的模型：
 
 ```env
+# Gemini models
+GEMINI_MODEL=gemini-3-pro-preview # default
+
 # Moonshot models | 月之暗面模型
 MOONSHOT_MODEL=kimi-k2-thinking  # default | 默认
 
@@ -223,7 +234,7 @@ docker run -p 3000:3000 --env-file .env ai-whiteboard
 - **Framework | 框架**: [Next.js 16](https://nextjs.org/) with App Router | 使用 App Router
 - **UI Library | UI 库**: [Excalidraw](https://excalidraw.com/) - Infinite canvas whiteboard | 无限画布白板
 - **Styling | 样式**: [Tailwind CSS](https://tailwindcss.com/)
-- **AI SDK | AI 开发套件**: [Vercel AI SDK](https://sdk.vercel.ai/) with Moonshot AI (Kimi K2) | 使用月之暗面 AI（Kimi K2）
+- **AI SDK | AI 开发套件**: [Vercel AI SDK](https://sdk.vercel.ai/) with Google Gemini | 使用 Google Gemini
 - **Language | 语言**: TypeScript
 
 ---
@@ -266,7 +277,7 @@ MIT
 
 - [Excalidraw](https://excalidraw.com/) for the amazing whiteboard library | 出色的白板库
 - [Vercel AI SDK](https://sdk.vercel.ai/) for simplifying AI integration | 简化 AI 集成
-- [Moonshot AI](https://www.moonshot.cn/) for the Kimi K2 thinking model | Kimi K2 思维模型
+- [Google Gemini](https://ai.google.dev/) for the powerful language models | Kimi K2 思维模型
 
 ---
 
@@ -280,7 +291,7 @@ MIT
 
 # 🎨 AI 白板编辑器
 
-一个由 Next.js、Excalidraw 和月之暗面 AI 的 Kimi K2 驱动的智能白板编辑器。用自然语言描述您想绘制的内容，AI 将实时为您生成图表、流程图和形状！
+一个由 Next.js、Excalidraw 和 Google Gemini 驱动的智能白板编辑器。用自然语言描述您想绘制的内容，AI 将实时为您生成图表、流程图和形状！
 
 ### 核心特性
 
@@ -303,7 +314,7 @@ cd /Users/daoming/prog/test/kimi/app/whiteboard/ai-whiteboard
 ```bash
 cp .env.example .env
 ```
-编辑 `.env` 文件，添加您的月之暗面 API 密钥。
+编辑 `.env` 文件，添加您的 Google Gemini API 密钥。
 
 3. **运行项目**
 ```bash
@@ -330,7 +341,7 @@ npm run dev
 
 - **前端**: Next.js 16 + React + TypeScript
 - **白板引擎**: Excalidraw
-- **AI 服务**: 月之暗面 Kimi K2 (moonshot-v1-8k)
+- **AI 服务**: Google Gemini (gemini-3-pro-preview)
 - **样式**: Tailwind CSS
 - **状态管理**: React Hooks
 
